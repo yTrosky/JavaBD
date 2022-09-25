@@ -1,7 +1,9 @@
 package controle;
 
-import conexao.Conexao;
+import conexao.Conexao; // importar do package a classe
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel; // para reconhecimento da Jtable
+import java.sql.*; // para reconhecimento dos comandos SQL
 
 
 
@@ -9,10 +11,14 @@ public class jfmTela extends javax.swing.JFrame {
 
     Conexao con_cliente;
     
-    public jfmTela() {
+   public jfmTela() {
         initComponents();
-        con_cliente = new Conexao();
-        con_cliente.conecta();
+        con_cliente = new Conexao(); // inicialização do objeto como instância
+        con_cliente.conecta(); // chama o método que conecta
+        con_cliente.executaSQL("select * from tbclientes order by cod");
+        preencherTabela();
+        posicionarRegistro();
+        tblClientes.setAutoCreateRowSorter(true); // ativa a classificação ordenada da tabela
     }
 
     /**
@@ -31,13 +37,17 @@ public class jfmTela extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
+        txtCod = new javax.swing.JTextField();
+        txtNome = new javax.swing.JTextField();
+        txtNasc = new javax.swing.JTextField();
+        txtFone = new javax.swing.JTextField();
+        txtEmail = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        tblClientes = new javax.swing.JTable();
+        PrimeiroRegistro = new javax.swing.JButton();
+        VoltarUmRegistro = new javax.swing.JButton();
+        AvancarUmRegistro = new javax.swing.JButton();
+        UltimoRegistro = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -64,7 +74,7 @@ public class jfmTela extends javax.swing.JFrame {
 
         jLabel5.setText("Email:");
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+        tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -75,7 +85,35 @@ public class jfmTela extends javax.swing.JFrame {
                 "Código", "Nome", "Data Nascimento", "Telefone", "Email"
             }
         ));
-        jScrollPane3.setViewportView(jTable3);
+        jScrollPane3.setViewportView(tblClientes);
+
+        PrimeiroRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/controle/resultset_first.png"))); // NOI18N
+        PrimeiroRegistro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PrimeiroRegistroActionPerformed(evt);
+            }
+        });
+
+        VoltarUmRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/controle/resultset_previous.png"))); // NOI18N
+        VoltarUmRegistro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                VoltarUmRegistroActionPerformed(evt);
+            }
+        });
+
+        AvancarUmRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/controle/resultset_next.png"))); // NOI18N
+        AvancarUmRegistro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AvancarUmRegistroActionPerformed(evt);
+            }
+        });
+
+        UltimoRegistro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/controle/resultset_last.png"))); // NOI18N
+        UltimoRegistro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                UltimoRegistroActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -87,29 +125,39 @@ public class jfmTela extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(140, 140, 140)
-                        .addComponent(jTextField5))
+                        .addComponent(txtEmail))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(140, 140, 140)
-                        .addComponent(jTextField4))
+                        .addComponent(txtFone))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addGap(100, 100, 100)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtNasc, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(140, 140, 140)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCod, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addGap(281, 281, 281))
             .addGroup(layout.createSequentialGroup()
-                .addGap(63, 63, 63)
+                .addGap(127, 127, 127)
+                .addComponent(PrimeiroRegistro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(94, 94, 94)
+                .addComponent(VoltarUmRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(89, 89, 89)
+                .addComponent(AvancarUmRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(86, 86, 86)
+                .addComponent(UltimoRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(197, 197, 197))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(70, 70, 70)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -119,34 +167,144 @@ public class jfmTela extends javax.swing.JFrame {
                 .addGap(51, 51, 51)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtCod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtNasc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(61, 61, 61)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(VoltarUmRegistro)
+                        .addComponent(AvancarUmRegistro)
+                        .addComponent(UltimoRegistro))
+                    .addComponent(PrimeiroRegistro))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addGap(28, 28, 28))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
+    private void PrimeiroRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrimeiroRegistroActionPerformed
+        try {
+            con_cliente.resultset.first();
+            mostrar_Dados();           
+        } catch(SQLException erro) {
+            JOptionPane.showMessageDialog(null,"Não foi possível acessar o primeiro registro: "+erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    
+    }//GEN-LAST:event_PrimeiroRegistroActionPerformed
+
+    private void UltimoRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UltimoRegistroActionPerformed
+                try {
+            con_cliente.resultset.last();
+            mostrar_Dados();           
+        } catch(SQLException erro) {
+            JOptionPane.showMessageDialog(null,"Não foi possível posicionar no último registro: "+erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_UltimoRegistroActionPerformed
+
+    private void VoltarUmRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VoltarUmRegistroActionPerformed
+        try {
+            con_cliente.resultset.previous();
+            mostrar_Dados();           
+        } catch(SQLException erro) {
+            JOptionPane.showMessageDialog(null,"Não foi possível posicionar no registro anterior: "+erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_VoltarUmRegistroActionPerformed
+
+    private void AvancarUmRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AvancarUmRegistroActionPerformed
+         try {
+            con_cliente.resultset.next();
+            mostrar_Dados();           
+        } catch(SQLException erro) {
+            JOptionPane.showMessageDialog(null,"Não foi possível posicionar no próximo registro: "+erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_AvancarUmRegistroActionPerformed
+
+    
+    
+    private void tblClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblClientesKeyPressed
+        // evento que sincroniza a grid com as setas do teclado
+        int linha_selecionada = tblClientes.getSelectedRow();
+        txtCod.setText(tblClientes.getValueAt(linha_selecionada, 0).toString());
+        txtNome.setText(tblClientes.getValueAt(linha_selecionada, 1).toString());
+        txtNasc.setText(tblClientes.getValueAt(linha_selecionada, 2).toString());
+        txtFone.setText(tblClientes.getValueAt(linha_selecionada, 3).toString());
+        txtEmail.setText(tblClientes.getValueAt(linha_selecionada, 4).toString());
+    }
+
+    private void tblClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientesMouseClicked
+        int linha_selecionada = tblClientes.getSelectedRow();
+        txtCod.setText(tblClientes.getValueAt(linha_selecionada, 0).toString());
+        txtNome.setText(tblClientes.getValueAt(linha_selecionada, 1).toString());
+        txtNasc.setText(tblClientes.getValueAt(linha_selecionada, 2).toString());
+        txtFone.setText(tblClientes.getValueAt(linha_selecionada, 3).toString());
+        txtEmail.setText(tblClientes.getValueAt(linha_selecionada, 4).toString());
+    }
+    
+  public void preencherTabela(){
+      tblClientes.getColumnModel() .getColumn(0) .setPreferredWidth(4);
+      tblClientes.getColumnModel() .getColumn(1) .setPreferredWidth(150);
+      tblClientes.getColumnModel() .getColumn(2) .setPreferredWidth(11);
+      tblClientes.getColumnModel() .getColumn(3) .setPreferredWidth(14);
+      tblClientes.getColumnModel() .getColumn(4) .setPreferredWidth(100);
+      
+      DefaultTableModel modelo = (DefaultTableModel) tblClientes.getModel();
+      modelo.setNumRows(0);
+      
+       try {
+            con_cliente.resultset.beforeFirst();
+            while(con_cliente.resultset.next()){
+                modelo.addRow(new Object[]{
+                    con_cliente.resultset.getString("cod"),
+                    con_cliente.resultset.getString("nome"),
+                    con_cliente.resultset.getString("dt_nasc"),
+                    con_cliente.resultset.getString("telefone"), 
+                    con_cliente.resultset.getString("email")
+                });
+            }
+        }catch(SQLException erro){
+                    JOptionPane.showMessageDialog(null,"\n Erro ao listar dados da tabela!! :\n "
+                    +erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+  
+   public void posicionarRegistro() {
+        try {
+            con_cliente.resultset.first(); // posiciona no 1ª registro da tabela
+            mostrar_Dados(); // chama o método que irá buscar o dado da tabela
+        } catch(SQLException erro) {
+            JOptionPane.showMessageDialog(null,"Não foi possível posicionar no primeiro registro: "+erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    public void mostrar_Dados(){
+        try {
+            txtCod.setText(con_cliente.resultset.getString("cod")); // Associar a caixa de texto ao campo cod
+            txtNome.setText(con_cliente.resultset.getString("nome")); // Associar a caixa de texto ao campo nome
+            txtNasc.setText(con_cliente.resultset.getString("dt_nasc"));
+            txtFone.setText(con_cliente.resultset.getString("telefone"));
+            txtEmail.setText(con_cliente.resultset.getString("email"));
+        } catch(SQLException erro) {
+            JOptionPane.showMessageDialog(null,"Não localizou dados: "+erro,"Mensagem do Programa",JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+  
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -180,6 +338,10 @@ public class jfmTela extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton AvancarUmRegistro;
+    private javax.swing.JButton PrimeiroRegistro;
+    private javax.swing.JButton UltimoRegistro;
+    private javax.swing.JButton VoltarUmRegistro;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -188,11 +350,11 @@ public class jfmTela extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable3;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JTable tblClientes;
+    private javax.swing.JTextField txtCod;
+    private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtFone;
+    private javax.swing.JTextField txtNasc;
+    private javax.swing.JTextField txtNome;
     // End of variables declaration//GEN-END:variables
 }
